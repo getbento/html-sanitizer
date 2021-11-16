@@ -243,6 +243,9 @@ class Sanitizer(object):
             whitespace_re=self.whitespace_re,
         )
         html = "<div>%s</div>" % html
+        # Prevents instances of "&quot;" from being parsed into quotes
+        html = html.replace('&quot;', "|quot;")
+
         try:
             doc = lxml.html.fromstring(html)
             lxml.html.tostring(doc, encoding="utf-8")
@@ -397,6 +400,9 @@ class Sanitizer(object):
         )(doc)
 
         html = lxml.html.tostring(doc, encoding="unicode")
+
+        # Add proper HTML quotes back
+        html = html.replace('|quot;', '&quot;')
 
         # add a space before the closing slash in empty tags
         html = re.sub(r"<([^/>]+)/>", r"<\1 />", html)
